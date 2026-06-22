@@ -5,8 +5,21 @@
 
 using namespace color;
 
-Color RayColor(const Ray &r) {
-    Vec3 unitDir = Normalize(r.dir());                                  // y -> [-1, 1]
+bool HitSphere(const Point3 &center, double radius, const Ray &ray) {
+    Vec3 oc = center - ray.orig();
+    real_t a = Dot(ray.dir(), ray.dir());
+    real_t b = -2.0 * Dot(ray.dir(), oc);
+    real_t c = Dot(oc, oc) - radius * radius;
+    real_t discriminant = b * b - 4 * a * c;
+    return (discriminant >= 0); // 1 or 2 roots
+}
+
+Color RayColor(const Ray &ray) {
+    // sphere
+    if (HitSphere(Point3(0, 0, -1), 0.5, ray))
+        return Color(1, 0, 0);
+    // background
+    Vec3 unitDir = Normalize(ray.dir());                                // y -> [-1, 1]
     real_t w = 0.5 * (unitDir.y() + 1.0);                               // w -> [0, 1]
     return (1.0 - w) * Color(1.0, 1.0, 1.0) + w * Color(0.5, 0.7, 1.0); // White ~ Skyblue
 }
