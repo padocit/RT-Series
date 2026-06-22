@@ -1,23 +1,33 @@
 #include "Color.h"
 #include "Ray.h"
-#include <cmath>
 #include <iostream>
 
 using namespace color;
 
-bool HitSphere(const Point3 &center, double radius, const Ray &ray) {
+// TODO: Distinguish sphere behind the camera
+real_t HitSphere(const Point3 &center, double radius, const Ray &ray) {
     Vec3 oc = center - ray.orig();
-    real_t a = Dot(ray.dir(), ray.dir());
-    real_t b = -2.0 * Dot(ray.dir(), oc);
-    real_t c = Dot(oc, oc) - radius * radius;
-    real_t discriminant = b * b - 4 * a * c;
-    return (discriminant >= 0); // 1 or 2 roots
+    real_t a = ray.dir().LengthSquared();
+    real_t h = Dot(ray.dir(), oc); // b = -2h
+    real_t c = oc.LengthSquared() - radius * radius;
+    real_t discriminant = h * h - a * c;
+
+    if (discriminant < 0) {
+        return -1.0;
+    } else {
+        return (h - std::sqrt(discriminant)) / a;
+    }
 }
 
 Color RayColor(const Ray &ray) {
     // sphere
-    if (HitSphere(Point3(0, 0, -1), 0.5, ray))
-        return Color(1, 0, 0);
+    Point3 sphereCenter(0, 0, -1);
+    real_t t = HitSphere(sphereCenter, 0.5, ray);
+    if (t > 0.0) {
+        Vec3 N = Normalize(ray.At(t) - sphereCenter);
+        return 0.5 * Color(N.x() + 1, N.y() + 1, N.z() + 1); // [-1, 1] -> [0, 1]
+    }
+
     // background
     Vec3 unitDir = Normalize(ray.dir());                                // y -> [-1, 1]
     real_t w = 0.5 * (unitDir.y() + 1.0);                               // w -> [0, 1]
