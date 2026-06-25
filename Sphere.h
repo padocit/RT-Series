@@ -7,7 +7,7 @@ class Sphere : public Hittable {
   public:
     Sphere(const Point3 &center, real_t radius) : center_(center), radius_(std::fmax(0, radius)) {}
 
-    bool Hit(const Ray &ray, real_t tmin, real_t tmax, HitRecord &rec) const override {
+    bool Hit(const Ray &ray, real_t tMin, real_t tMax, HitRecord &rec) const override {
         Vec3 oc = center_ - ray.orig();
         real_t a = ray.dir().LengthSquared();
         real_t h = Dot(ray.dir(), oc); // b = -2h
@@ -21,16 +21,17 @@ class Sphere : public Hittable {
 
         // Nearest root in [t_min, t_max]
         real_t root = (h - sqrtD) / a;
-        if (root <= tmin || root >= tmax) {
+        if (root <= tMin || root >= tMax) {
             root = (h + sqrtD) / a;
-            if (root <= tmin || root >= tmax)
+            if (root <= tMin || root >= tMax)
                 return false;
         }
 
         // Hit Record
         rec.t = root;
         rec.p = ray.At(rec.t);
-        rec.normal = (rec.p - center_) / radius_;
+        Vec3 outwardNormal = (rec.p - center_) / radius_;
+        rec.SetFaceNormal(ray, outwardNormal);
 
         return true;
     }

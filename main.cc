@@ -24,8 +24,8 @@ Color RayColor(const Ray &ray) {
     Point3 sphereCenter(0, 0, -1);
     real_t t = HitSphere(sphereCenter, 0.5, ray);
     if (t > 0.0) {
-        Vec3 N = Normalize(ray.At(t) - sphereCenter);
-        return 0.5 * Color(N.x() + 1, N.y() + 1, N.z() + 1); // [-1, 1] -> [0, 1]
+        Vec3 Normal = Normalize(ray.At(t) - sphereCenter);
+        return 0.5 * Color(Normal.x() + 1, Normal.y() + 1, Normal.z() + 1); // [-1, 1] -> [0, 1]
     }
 
     // background
