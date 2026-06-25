@@ -1,6 +1,9 @@
-#include "Color.h"
-#include "Ray.h"
-#include <iostream>
+#include "Common.h"
+
+// Scene-specific objects
+#include "Hittable.h"
+#include "HittableList.h"
+#include "Sphere.h"
 
 using namespace color;
 

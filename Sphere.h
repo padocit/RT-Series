@@ -7,6 +7,7 @@ class Sphere : public Hittable {
   public:
     Sphere(const Point3 &center, real_t radius) : center_(center), radius_(std::fmax(0, radius)) {}
 
+    // TODO: Distinguish sphere behind the camera
     bool Hit(const Ray &ray, real_t tMin, real_t tMax, HitRecord &rec) const override {
         Vec3 oc = center_ - ray.orig();
         real_t a = ray.dir().LengthSquared();
