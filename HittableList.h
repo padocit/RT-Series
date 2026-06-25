@@ -4,17 +4,14 @@
 #include <memory>
 #include <vector>
 
-using std::make_shared;
-using std::shared_ptr;
-
 class HittableList : public Hittable {
   public:
     HittableList() {}
-    HittableList(shared_ptr<Hittable> object) { Add(object); }
+    HittableList(std::shared_ptr<Hittable> object) { Add(object); }
 
     void Clear() { objects_.clear(); }
 
-    void Add(shared_ptr<Hittable> object) { objects_.push_back(object); }
+    void Add(std::shared_ptr<Hittable> object) { objects_.push_back(object); }
 
     // Hit() returns &rec
     bool Hit(const Ray &ray, real_t tMin, real_t tMax, HitRecord &rec) const override {
@@ -34,5 +31,5 @@ class HittableList : public Hittable {
     }
 
   private:
-    std::vector<shared_ptr<Hittable>> objects_;
+    std::vector<std::shared_ptr<Hittable>> objects_;
 };
