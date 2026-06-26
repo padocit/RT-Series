@@ -7,46 +7,31 @@
 
 using namespace color;
 
-// TODO: Distinguish sphere behind the camera
-real_t HitSphere(const Point3 &center, double radius, const Ray &ray) {
-    Vec3 oc = center - ray.orig();
-    real_t a = ray.dir().LengthSquared();
-    real_t h = Dot(ray.dir(), oc); // b = -2h
-    real_t c = oc.LengthSquared() - radius * radius;
-    real_t discriminant = h * h - a * c;
-
-    if (discriminant < 0) {
-        return -1.0;
-    } else {
-        return (h - std::sqrt(discriminant)) / a;
+Color RayColor(const Ray &ray, const Hittable &world) { // world is overcasting
+    HitRecord rec;
+    if (world.Hit(ray, 0, kInfinity, rec)) {
+        return 0.5 * (rec.normal + Color(1, 1, 1));
     }
-}
-
-Color RayColor(const Ray &ray) {
-    // sphere
-    Point3 sphereCenter(0, 0, -1);
-    real_t t = HitSphere(sphereCenter, 0.5, ray);
-    if (t > 0.0) {
-        Vec3 Normal = Normalize(ray.At(t) - sphereCenter);
-        return 0.5 * Color(Normal.x() + 1, Normal.y() + 1, Normal.z() + 1); // [-1, 1] -> [0, 1]
-    }
-
-    // background
-    Vec3 unitDir = Normalize(ray.dir());                                // y -> [-1, 1]
-    real_t w = 0.5 * (unitDir.y() + 1.0);                               // w -> [0, 1]
-    return (1.0 - w) * Color(1.0, 1.0, 1.0) + w * Color(0.5, 0.7, 1.0); // White ~ Skyblue
 }
 
 int main() {
+    // Image
     real_t aspectRatio = 16.0 / 9.0;
     int imageWidth = 400;
     int imageHeight = std::max(1, int(imageWidth / aspectRatio));
 
+    // World
+    HittableList world;
+    world.Add(make_shared<Sphere>(Point3(0, 0, -1), 0.5));
+    world.Add(make_shared<Sphere>(Point3(0, -100.5, -1), 100));
+
+    // Camera
     real_t focalLength = 1.0;
     real_t viewportHeight = 2.0;
     real_t viewportWidth = viewportHeight * (real_t(imageWidth) / imageHeight);
     Point3 cameraCenter = Point3(0, 0, 0);
 
+    // Viewport
     Vec3 viewportU = Vec3(viewportWidth, 0, 0);
     Vec3 viewportV = Vec3(0, -viewportHeight, 0); // Flipped Y
 
@@ -70,7 +55,7 @@ int main() {
             Vec3 rayDir = pixelCenter - cameraCenter;
             Ray ray(cameraCenter, rayDir);
 
-            Color pixelColor = RayColor(ray);
+            Color pixelColor = RayColor(ray, world);
             WriteColor(std::cout, pixelColor);
         }
     }
