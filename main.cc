@@ -12,6 +12,11 @@ Color RayColor(const Ray &ray, const Hittable &world) { // world is overcasting
     if (world.Hit(ray, 0, kInfinity, rec)) {
         return 0.5 * (rec.normal + Color(1, 1, 1));
     }
+
+    // Sky background (No layer, Just paint)
+    Vec3 unitRayDir = Normalize(ray.dir());
+    real_t w = 0.5 * (unitRayDir.y() + 1.0);                            // [-1, 1] -> [0, 1]
+    return (1.0 - w) * Color(1.0, 1.0, 1.0) + w * Color(0.5, 0.7, 1.0); // White ~ Skyblue
 }
 
 int main() {
@@ -55,6 +60,7 @@ int main() {
             Vec3 rayDir = pixelCenter - cameraCenter;
             Ray ray(cameraCenter, rayDir);
 
+            // Shading
             Color pixelColor = RayColor(ray, world);
             WriteColor(std::cout, pixelColor);
         }
