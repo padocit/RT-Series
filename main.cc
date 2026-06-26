@@ -9,7 +9,7 @@ using namespace color;
 
 Color RayColor(const Ray &ray, const Hittable &world) { // world is overcasting
     HitRecord rec;
-    if (world.Hit(ray, 0, kInfinity, rec)) {
+    if (world.Hit(ray, Interval(0, kInfinity), rec)) {
         return 0.5 * (rec.normal + Color(1, 1, 1));
     }
 

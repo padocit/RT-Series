@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Hittable.h"
+#include "Interval.h"
 #include "Vec3.h"
 
 class Sphere : public Hittable {
@@ -8,7 +9,7 @@ class Sphere : public Hittable {
     Sphere(const Point3 &center, real_t radius) : center_(center), radius_(std::fmax(0, radius)) {}
 
     // TODO: Distinguish sphere behind the camera
-    bool Hit(const Ray &ray, real_t tMin, real_t tMax, HitRecord &rec) const override {
+    bool Hit(const Ray &ray, Interval rayT, HitRecord &rec) const override {
         Vec3 oc = center_ - ray.orig();
         real_t a = ray.dir().LengthSquared();
         real_t h = Dot(ray.dir(), oc); // b = -2h
@@ -22,9 +23,9 @@ class Sphere : public Hittable {
 
         // Nearest root in [t_min, t_max]
         real_t root = (h - sqrtD) / a;
-        if (root <= tMin || root >= tMax) {
+        if (!rayT.Surrounds(root)) {
             root = (h + sqrtD) / a;
-            if (root <= tMin || root >= tMax)
+            if (!rayT.Surrounds(root))
                 return false;
         }
 
