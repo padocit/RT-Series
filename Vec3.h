@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "Precision.h"
 #include <cmath>
 #include <iostream>
 
