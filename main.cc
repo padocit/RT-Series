@@ -16,6 +16,7 @@ int main() {
     Camera cam;
     cam.aspectRatio(16.0 / 9.0);
     cam.imageWidth(400);
+    cam.samplesPerPixel(100);
 
     // Render
     cam.Render(world);
