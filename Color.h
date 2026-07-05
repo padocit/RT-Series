@@ -3,8 +3,6 @@
 #include "Vec3.h"
 #include <iostream>
 
-namespace color {
-
 using Color = Vec3;
 
 void WriteColor(std::ostream &out, const Color &pixel) {
@@ -18,4 +16,3 @@ void WriteColor(std::ostream &out, const Color &pixel) {
 
     out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
 }
-} // namespace color

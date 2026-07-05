@@ -17,6 +17,12 @@ class Interval {
     bool Contains(real_t x) const { return min_ <= x && x <= max_; }
     bool Surrounds(real_t x) const { return min_ < x && x < max_; }
 
+    real_t Clamp(real_t x) const {
+        if (x < min_) return min_;
+        if (x > max_) return max_;
+        return x;
+    }
+
   private:
     real_t min_, max_;
 };

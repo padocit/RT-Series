@@ -1,70 +1,22 @@
 #include "Common.h"
 
+#include "Camera.h"
 // Scene-specific objects
 #include "Hittable.h"
 #include "HittableList.h"
 #include "Sphere.h"
 
-using namespace color;
-
-Color RayColor(const Ray &ray, const Hittable &world) { // world is overcasting
-    HitRecord rec;
-    if (world.Hit(ray, Interval(0, kInfinity), rec)) {
-        return 0.5 * (rec.normal + Color(1, 1, 1));
-    }
-
-    // Sky background (No layer, Just paint)
-    Vec3 unitRayDir = Normalize(ray.dir());
-    real_t w = 0.5 * (unitRayDir.y() + 1.0);                            // [-1, 1] -> [0, 1]
-    return (1.0 - w) * Color(1.0, 1.0, 1.0) + w * Color(0.5, 0.7, 1.0); // White ~ Skyblue
-}
-
 int main() {
-    // Image
-    real_t aspectRatio = 16.0 / 9.0;
-    int imageWidth = 400;
-    int imageHeight = std::max(1, int(imageWidth / aspectRatio));
-
     // World
     HittableList world;
     world.Add(make_shared<Sphere>(Point3(0, 0, -1), 0.5));
     world.Add(make_shared<Sphere>(Point3(0, -100.5, -1), 100));
 
     // Camera
-    real_t focalLength = 1.0;
-    real_t viewportHeight = 2.0;
-    real_t viewportWidth = viewportHeight * (real_t(imageWidth) / imageHeight);
-    Point3 cameraCenter = Point3(0, 0, 0);
-
-    // Viewport
-    Vec3 viewportU = Vec3(viewportWidth, 0, 0);
-    Vec3 viewportV = Vec3(0, -viewportHeight, 0); // Flipped Y
-
-    Vec3 pixelDeltaU = viewportU / imageWidth;
-    Vec3 pixelDeltaV = viewportV / imageHeight;
-
-    // -focalLength: Negative-Z-axis (Right-Handed Coordinates)
-    Point3 viewportUpperLeft =
-        cameraCenter - Vec3(0, 0, focalLength) - viewportU / 2 - viewportV / 2;
-
-    // The first pixel position
-    Point3 pixel00 = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
+    Camera cam;
+    cam.aspectRatio(16.0 / 9.0);
+    cam.imageWidth(400);
 
     // Render
-    std::cout << "P3\n" << imageWidth << " " << imageHeight << "\n255\n";
-
-    for (int j = 0; j < imageHeight; j++) {
-        std::clog << "\rScanlines remaining: " << (imageHeight - j) << ' ' << std::flush;
-        for (int i = 0; i < imageWidth; i++) {
-            Point3 pixelCenter = pixel00 + (i * pixelDeltaU) + (j * pixelDeltaV);
-            Vec3 rayDir = pixelCenter - cameraCenter;
-            Ray ray(cameraCenter, rayDir);
-
-            // Shading
-            Color pixelColor = RayColor(ray, world);
-            WriteColor(std::cout, pixelColor);
-        }
-    }
-
-    std::clog << "\rDone.               \n";
+    cam.Render(world);
 }
