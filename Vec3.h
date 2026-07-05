@@ -15,6 +15,12 @@ class Vec3 {
     real_t y() const { return e_[1]; }
     real_t z() const { return e_[2]; }
 
+    // Static utiliies
+    static Vec3 Random() { return Vec3(RandomReal(), RandomReal(), RandomReal()); }
+    static Vec3 Random(real_t min, real_t max) {
+        return Vec3(RandomReal(min, max), RandomReal(min, max), RandomReal(min, max));
+    }
+
     // 3. Member functions
     real_t Length() const { return std::sqrt(LengthSquared()); }
     real_t LengthSquared() const { return e_[0] * e_[0] + e_[1] * e_[1] + e_[2] * e_[2]; }
@@ -77,3 +83,20 @@ inline Vec3 Cross(const Vec3 &u, const Vec3 &v) {
 }
 
 inline Vec3 Normalize(const Vec3 &v) { return v / v.Length(); }
+
+// Rejection method
+inline Vec3 RandomUnitVector() {
+    while (true) {
+        Point3 p = Vec3::Random(-1, 1);
+        real_t lensq = p.LengthSquared();
+        if (kNormalizationEpsilon < lensq && lensq <= 1) return p / sqrt(lensq);
+    }
+}
+
+inline Vec3 RandomOnHemisphere(const Vec3 &normal) {
+    Vec3 onUnitSphere = RandomUnitVector();
+    if (Dot(onUnitSphere, normal) > 0.0)
+        return onUnitSphere;
+    else
+        return -onUnitSphere;
+}

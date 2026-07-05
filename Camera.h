@@ -2,6 +2,7 @@
 
 #include "Color.h"
 #include "Hittable.h"
+#include "Precision.h"
 
 class Camera {
   public:
@@ -103,7 +104,8 @@ class Camera {
         HitRecord rec;
 
         if (world.Hit(ray, Interval(0, kInfinity), rec)) {
-            return 0.5 * (rec.normal + Color(1, 1, 1));
+            Vec3 direction = RandomOnHemisphere(rec.normal);
+            return 0.5 * (RayColor(Ray(rec.p, direction), world));
         }
 
         // Sky background (It's not a layer, Just fill-in)
