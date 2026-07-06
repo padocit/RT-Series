@@ -11,10 +11,12 @@ class Camera {
     real_t aspectRatio() const { return aspectRatio_; }
     int imageWidth() const { return imageWidth_; }
     int samplesPerPixel() const { return samplesPerPixel_; }
+    int maxDepth() const { return maxDepth_; } // Initial depth
 
     void aspectRatio(real_t ratio) { aspectRatio_ = ratio; }
     void imageWidth(int width) { imageWidth_ = width; }
     void samplesPerPixel(int sample) { samplesPerPixel_ = sample; }
+    void maxDepth(int depth) { maxDepth_ = depth; }
 
     void Render(const Hittable &world) {
         // Init
@@ -30,7 +32,7 @@ class Camera {
                 // Multi-Sampling
                 for (int sample = 0; sample < samplesPerPixel_; sample++) {
                     Ray ray = GetRay(i, j);
-                    pixelColor += RayColor(ray, world);
+                    pixelColor += RayColor(ray, maxDepth_, world);
                 }
                 WriteColor(std::cout, pixelSamplesScale_ * pixelColor);
             }
@@ -42,12 +44,14 @@ class Camera {
   private:
     real_t aspectRatio_ = 1.0;
     int imageWidth_ = 100;
+    int samplesPerPixel_ = 10;
+    int maxDepth_ = 10;
+
     int imageHeight_ = 100;
 
     real_t focalLength_ = 1.0;
     Point3 cameraCenter_ = Point3(0, 0, 0);
 
-    int samplesPerPixel_ = 10;
     real_t pixelSamplesScale_; // Color scale factor
 
     Vec3 pixelDeltaU_;
@@ -100,12 +104,14 @@ class Camera {
         return Vec3(RandomReal() - 0.5, RandomReal() - 0.5, 0);
     }
 
-    Color RayColor(const Ray &ray, const Hittable &world) const {
+    Color RayColor(const Ray &ray, int depth, const Hittable &world) const {
+        if (depth <= 0) return Color(0, 0, 0); // The limit of Raycolor recursion
+
         HitRecord rec;
 
-        if (world.Hit(ray, Interval(0, kInfinity), rec)) {
+        if (world.Hit(ray, Interval(0.001, kInfinity), rec)) { // 0.001 to prevent Shadow-acne
             Vec3 direction = RandomOnHemisphere(rec.normal);
-            return 0.5 * (RayColor(Ray(rec.p, direction), world));
+            return 0.5 * (RayColor(Ray(rec.p, direction), depth - 1, world)); // Recursion
         }
 
         // Sky background (It's not a layer, Just fill-in)

@@ -4,7 +4,7 @@
 #include <type_traits>
 
 // Precision
-using real_t = double;
+using real_t = float;
 
 // Constants
 const real_t kInfinity = std::numeric_limits<real_t>::infinity();
