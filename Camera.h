@@ -110,7 +110,7 @@ class Camera {
         HitRecord rec;
 
         if (world.Hit(ray, Interval(0.001, kInfinity), rec)) { // 0.001 to prevent Shadow-acne
-            Vec3 direction = RandomOnHemisphere(rec.normal);
+            Vec3 direction = rec.normal + RandomUnitVector();  // Lambertian distribution
             return 0.5 * (RayColor(Ray(rec.p, direction), depth - 1, world)); // Recursion
         }
 
