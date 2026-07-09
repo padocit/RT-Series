@@ -6,10 +6,21 @@
 
 using Color = Vec3;
 
+inline real_t LinearToGamma(real_t linearComponent) {
+    if (linearComponent > 0) return std::sqrt(linearComponent);
+
+    return 0;
+}
+
 void WriteColor(std::ostream &out, const Color &pixel) {
-    auto r = pixel.x();
-    auto g = pixel.y();
-    auto b = pixel.z();
+    real_t r = pixel.x();
+    real_t g = pixel.y();
+    real_t b = pixel.z();
+
+    // Linear to gamma (gamma 2)
+    r = LinearToGamma(r);
+    g = LinearToGamma(g);
+    b = LinearToGamma(b);
 
     // [0,1] -> [0,255]
     static const Interval intensity(0.000, 0.999);
