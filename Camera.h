@@ -2,6 +2,7 @@
 
 #include "Color.h"
 #include "Hittable.h"
+#include "Material.h"
 #include "Precision.h"
 
 class Camera {
@@ -110,8 +111,12 @@ class Camera {
         HitRecord rec;
 
         if (world.Hit(ray, Interval(0.001, kInfinity), rec)) { // 0.001 to prevent Shadow-acne
-            Vec3 direction = rec.normal + RandomUnitVector();  // Lambertian distribution
-            return 0.5 * (RayColor(Ray(rec.p, direction), depth - 1, world)); // Recursion
+            Ray scattered;
+            Color attenuation;
+            if (rec.mat->Scatter(ray, rec, attenuation, scattered))
+                return attenuation * RayColor(scattered, depth - 1, world); // Recursion
+
+            return Color(0, 0, 0);
         }
 
         // Sky background (It's not a layer, Just fill-in)
