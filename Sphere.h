@@ -4,9 +4,13 @@
 #include "Interval.h"
 #include "Vec3.h"
 
+class Material;
+
 class Sphere : public Hittable {
   public:
-    Sphere(const Point3 &center, real_t radius) : center_(center), radius_(std::fmax(0, radius)) {}
+    Sphere(const Point3 &center, real_t radius) : center_(center), radius_(std::fmax(0, radius)) {
+        // TODO: Initialize the material pointer `mat`.
+    }
 
     // TODO: Distinguish sphere behind the camera
     bool Hit(const Ray &ray, Interval rayT, HitRecord &rec) const override {
@@ -16,8 +20,7 @@ class Sphere : public Hittable {
         real_t c = oc.LengthSquared() - radius_ * radius_;
 
         real_t discriminant = h * h - a * c;
-        if (discriminant < 0)
-            return false;
+        if (discriminant < 0) return false;
 
         real_t sqrtD = std::sqrt(discriminant);
 
@@ -25,8 +28,7 @@ class Sphere : public Hittable {
         real_t root = (h - sqrtD) / a;
         if (!rayT.Surrounds(root)) {
             root = (h + sqrtD) / a;
-            if (!rayT.Surrounds(root))
-                return false;
+            if (!rayT.Surrounds(root)) return false;
         }
 
         // Hit Record
@@ -34,6 +36,7 @@ class Sphere : public Hittable {
         rec.p = ray.At(rec.t);
         Vec3 outwardNormal = (rec.p - center_) / radius_;
         rec.SetFaceNormal(ray, outwardNormal);
+        rec.mat = mat;
 
         return true;
     }
@@ -41,4 +44,5 @@ class Sphere : public Hittable {
   private:
     Point3 center_;
     real_t radius_;
+    shared_ptr<Material> mat;
 };

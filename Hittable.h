@@ -3,9 +3,15 @@
 #include "Interval.h"
 #include "Ray.h"
 
-struct HitRecord {
+#include <memory>
+
+class Material;
+
+class HitRecord {
+  public:
     Point3 p;
     Vec3 normal;
+    std::shared_ptr<Material> mat;
     real_t t;
     bool frontFace;
 
