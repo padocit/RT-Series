@@ -9,7 +9,7 @@ class Material;
 class Sphere : public Hittable {
   public:
     Sphere(const Point3 &center, real_t radius) : center_(center), radius_(std::fmax(0, radius)) {
-        // TODO: Initialize the material pointer `mat`.
+        // TODO: Initialize the material pointer `mat_`.
     }
 
     // TODO: Distinguish sphere behind the camera
@@ -36,7 +36,7 @@ class Sphere : public Hittable {
         rec.p = ray.At(rec.t);
         Vec3 outwardNormal = (rec.p - center_) / radius_;
         rec.SetFaceNormal(ray, outwardNormal);
-        rec.mat = mat;
+        rec.mat = mat_;
 
         return true;
     }
@@ -44,5 +44,5 @@ class Sphere : public Hittable {
   private:
     Point3 center_;
     real_t radius_;
-    shared_ptr<Material> mat;
+    shared_ptr<Material> mat_;
 };

@@ -25,6 +25,11 @@ class Vec3 {
     real_t Length() const { return std::sqrt(LengthSquared()); }
     real_t LengthSquared() const { return e_[0] * e_[0] + e_[1] * e_[1] + e_[2] * e_[2]; }
 
+    bool NearZero() const {
+        real_t s = 1e-8;
+        return (std::fabs(e_[0] < s)) && (std::fabs(e_[1] < s)) && (std::fabs(e_[2] < s));
+    }
+
     // 4. Operators
     Vec3 operator-() const { return Vec3(-e_[0], -e_[1], -e_[2]); }
     real_t operator[](int i) const { return e_[i]; }
