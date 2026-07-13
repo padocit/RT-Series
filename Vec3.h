@@ -105,3 +105,5 @@ inline Vec3 RandomOnHemisphere(const Vec3 &normal) {
     else
         return -onUnitSphere;
 }
+
+inline Vec3 Reflect(const Vec3 &v, const Vec3 &n) { return v - 2 * Dot(v, n) * n; }
