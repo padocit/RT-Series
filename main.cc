@@ -13,8 +13,8 @@ int main() {
 
     auto matGround = make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
     auto matCenter = make_shared<Lambertian>(Color(0.1, 0.2, 0.5));
-    auto matLeft = make_shared<Metal>(Color(0.8, 0.8, 0.8));
-    auto matRight = make_shared<Metal>(Color(0.8, 0.6, 0.2));
+    auto matLeft = make_shared<Metal>(Color(0.8, 0.8, 0.8), 0.3);
+    auto matRight = make_shared<Metal>(Color(0.8, 0.6, 0.2), 1.0);
 
     world.Add(make_shared<Sphere>(Point3(0.0, -100.5, -1.0), 100.0, matGround));
     world.Add(make_shared<Sphere>(Point3(0.0, 0.0, -1.2), 0.5, matCenter));
