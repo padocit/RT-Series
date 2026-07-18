@@ -41,7 +41,7 @@ class Metal : public Material {
     bool Scatter(const Ray &inRay, const HitRecord &rec, Color &attenuation,
                  Ray &scatteredRay) const override {
         Vec3 reflectedDir = Reflect(inRay.dir(), rec.normal);
-        reflectedDir = Normalize(reflectedDir) + (fuzz_ * RandomUnitVector());
+        reflectedDir = Normalize(reflectedDir) + (fuzz_ * RandomUnitVector()); // fuzz
         scatteredRay = Ray(rec.p, reflectedDir);
         attenuation = albedo_;
         return true;
@@ -50,4 +50,25 @@ class Metal : public Material {
   private:
     Color albedo_;
     real_t fuzz_;
+};
+
+class Dielectric : public Material {
+  public:
+    Dielectric(real_t refractionIndex) : refractionIndex_(refractionIndex) {}
+
+    bool Scatter(const Ray &inRay, const HitRecord &rec, Color &attenuation,
+                 Ray &scatteredRay) const override {
+        attenuation = Color(1.0, 1.0, 1.0);
+        real_t ri = rec.frontFace ? (1.0 / refractionIndex_) : refractionIndex_; // In? or Out?
+
+        Vec3 unitDir = Normalize(inRay.dir());
+        Vec3 refractedDir = Refract(unitDir, rec.normal, ri);
+
+        scatteredRay = Ray(rec.p, refractedDir);
+        return true;
+    }
+
+  private:
+    real_t refractionIndex_; // The ratio of this mat's refractive index
+                             // over the refracitve index of the enclosing media
 };

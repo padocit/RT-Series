@@ -107,3 +107,10 @@ inline Vec3 RandomOnHemisphere(const Vec3 &normal) {
 }
 
 inline Vec3 Reflect(const Vec3 &v, const Vec3 &n) { return v - 2 * Dot(v, n) * n; }
+
+inline Vec3 Refract(const Vec3 &uv, const Vec3 &n, real_t etaiOverEtat) {
+    real_t cosTheta = std::fmin(Dot(-uv, n), real_t(1.0));
+    Vec3 rOutPerp = etaiOverEtat * (uv + cosTheta * n);
+    Vec3 rOutParallel = -std::sqrt(std::fabs(real_t(1.0) - rOutPerp.LengthSquared())) * n;
+    return rOutPerp + rOutParallel;
+}
