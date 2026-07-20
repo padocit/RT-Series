@@ -45,6 +45,7 @@ class Camera {
   private:
     real_t aspectRatio_ = 1.0;
     int imageWidth_ = 100;
+
     int samplesPerPixel_ = 10;
     int maxDepth_ = 10;
 

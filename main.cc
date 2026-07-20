@@ -14,11 +14,13 @@ int main() {
     auto matGround = make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
     auto matCenter = make_shared<Lambertian>(Color(0.1, 0.2, 0.5));
     auto matLeft = make_shared<Dielectric>(1.50); // Refractive index
+    auto matBubble = make_shared<Dielectric>(1.00 / 1.50);
     auto matRight = make_shared<Metal>(Color(0.8, 0.6, 0.2), 1.0);
 
     world.Add(make_shared<Sphere>(Point3(0.0, -100.5, -1.0), 100.0, matGround));
     world.Add(make_shared<Sphere>(Point3(0.0, 0.0, -1.2), 0.5, matCenter));
     world.Add(make_shared<Sphere>(Point3(-1.0, 0.0, -1.0), 0.5, matLeft));
+    world.Add(make_shared<Sphere>(Point3(-1.0, 0.0, -1.0), 0.4, matBubble));
     world.Add(make_shared<Sphere>(Point3(1.0, 0.0, -1.0), 0.5, matRight));
 
     // Camera
