@@ -13,11 +13,13 @@ class Camera {
     int imageWidth() const { return imageWidth_; }
     int samplesPerPixel() const { return samplesPerPixel_; }
     int maxDepth() const { return maxDepth_; } // Initial depth
+    real_t vFov() const { return vFov_; }
 
     void aspectRatio(real_t ratio) { aspectRatio_ = ratio; }
     void imageWidth(int width) { imageWidth_ = width; }
     void samplesPerPixel(int sample) { samplesPerPixel_ = sample; }
     void maxDepth(int depth) { maxDepth_ = depth; }
+    void vFov(real_t fov) { vFov_ = fov; }
 
     void Render(const Hittable &world) {
         // Init
@@ -45,9 +47,10 @@ class Camera {
   private:
     real_t aspectRatio_ = 1.0;
     int imageWidth_ = 100;
-
     int samplesPerPixel_ = 10;
     int maxDepth_ = 10;
+
+    real_t vFov_ = 90.0; // Vertical field-of-view in degrees
 
     int imageHeight_ = 100;
 
@@ -69,11 +72,13 @@ class Camera {
         pixelSamplesScale_ = 1.0 / samplesPerPixel_;
 
         // Camera
-        focalLength_ = 1.0;
         cameraCenter_ = Point3(0, 0, 0);
 
         // Viewport
-        real_t viewportHeight = 2.0;
+        focalLength_ = 1.0;
+        real_t theta = DegreesToRadians(vFov_);
+        real_t h = std::tan(theta / 2);
+        real_t viewportHeight = 2.0 * h * focalLength_;
         real_t viewportWidth = viewportHeight * (real_t(imageWidth_) / imageHeight_);
 
         Vec3 viewportU = Vec3(viewportWidth, 0, 0);
