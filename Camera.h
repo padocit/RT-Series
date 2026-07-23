@@ -14,12 +14,18 @@ class Camera {
     int samplesPerPixel() const { return samplesPerPixel_; }
     int maxDepth() const { return maxDepth_; } // Initial depth
     real_t vFov() const { return vFov_; }
+    Point3 lookfrom() const { return lookfrom_; }
+    Point3 lookat() const { return lookat_; }
+    Vec3 vup() const { return vup_; }
 
     void aspectRatio(real_t ratio) { aspectRatio_ = ratio; }
     void imageWidth(int width) { imageWidth_ = width; }
     void samplesPerPixel(int sample) { samplesPerPixel_ = sample; }
     void maxDepth(int depth) { maxDepth_ = depth; }
     void vFov(real_t fov) { vFov_ = fov; }
+    void lookfrom(const Point3 &from) { lookfrom_ = from; }
+    void lookat(const Point3 &at) { lookat_ = at; }
+    void vup(const Vec3 &up) { vup_ = up; }
 
     void Render(const Hittable &world) {
         // Init
@@ -51,17 +57,21 @@ class Camera {
     int maxDepth_ = 10;
 
     real_t vFov_ = 90.0; // Vertical field-of-view in degrees
+    Point3 lookfrom_ = Point3(0, 0, 0);
+    Point3 lookat_ = Point3(0, 0, -1);
+    Vec3 vup_ = Vec3(0, 1, 0);
 
+  private:
     int imageHeight_ = 100;
 
     real_t focalLength_ = 1.0;
     Point3 cameraCenter_ = Point3(0, 0, 0);
+    Vec3 u_, v_, w_;
 
     real_t pixelSamplesScale_; // Color scale factor
-
+    Point3 pixel00_;
     Vec3 pixelDeltaU_;
     Vec3 pixelDeltaV_;
-    Point3 pixel00_;
 
     void Initialize() {
         // Image
@@ -72,24 +82,29 @@ class Camera {
         pixelSamplesScale_ = 1.0 / samplesPerPixel_;
 
         // Camera
-        cameraCenter_ = Point3(0, 0, 0);
+        cameraCenter_ = lookfrom_;
 
         // Viewport
-        focalLength_ = 1.0;
+        focalLength_ = (lookfrom_ - lookat_).Length();
         real_t theta = DegreesToRadians(vFov_);
         real_t h = std::tan(theta / 2);
         real_t viewportHeight = 2.0 * h * focalLength_;
         real_t viewportWidth = viewportHeight * (real_t(imageWidth_) / imageHeight_);
 
-        Vec3 viewportU = Vec3(viewportWidth, 0, 0);
-        Vec3 viewportV = Vec3(0, -viewportHeight, 0); // Flipped Y
+        // Basis vectors
+        w_ = Normalize(lookfrom_ - lookat_);
+        u_ = Normalize(Cross(vup_, w_));
+        v_ = Cross(w_, u_);
+
+        Vec3 viewportU = viewportWidth * u_;
+        Vec3 viewportV = viewportHeight * -v_; // Flipped Y
 
         pixelDeltaU_ = viewportU / imageWidth_;
         pixelDeltaV_ = viewportV / imageHeight_;
 
         // -focalLength: Negative-Z-axis (Right-Handed Coordinates)
         Point3 viewportUpperLeft =
-            cameraCenter_ - Vec3(0, 0, focalLength_) - viewportU / 2 - viewportV / 2;
+            cameraCenter_ - focalLength_ * w_ - viewportU / 2 - viewportV / 2;
 
         // The first pixel position
         pixel00_ = viewportUpperLeft + 0.5 * (pixelDeltaU_ + pixelDeltaV_);
