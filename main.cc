@@ -35,6 +35,10 @@ int main() {
     cam.lookat(Point3(0, 0, -1));
     cam.vup(Vec3(0, 1, 0));
 
+    // Depth of Field
+    cam.defocusAngle(10.0);
+    cam.focusDist(3.4);
+
     // Render
     cam.Render(world);
 }

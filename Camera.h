@@ -17,6 +17,8 @@ class Camera {
     Point3 lookfrom() const { return lookfrom_; }
     Point3 lookat() const { return lookat_; }
     Vec3 vup() const { return vup_; }
+    real_t defocusAngle() const { return defocusAngle_; }
+    real_t focusDist() const { return focusDist_; }
 
     void aspectRatio(real_t ratio) { aspectRatio_ = ratio; }
     void imageWidth(int width) { imageWidth_ = width; }
@@ -26,6 +28,8 @@ class Camera {
     void lookfrom(const Point3 &from) { lookfrom_ = from; }
     void lookat(const Point3 &at) { lookat_ = at; }
     void vup(const Vec3 &up) { vup_ = up; }
+    void defocusAngle(real_t angle) { defocusAngle_ = angle; }
+    void focusDist(real_t dist) { focusDist_ = dist; }
 
     void Render(const Hittable &world) {
         // Init
@@ -61,10 +65,13 @@ class Camera {
     Point3 lookat_ = Point3(0, 0, -1);
     Vec3 vup_ = Vec3(0, 1, 0);
 
+    real_t defocusAngle_ = 0; // Cone; Variation angle of rays
+    real_t focusDist_ = 10;   // Perfect focus distance
+
   private:
     int imageHeight_ = 100;
 
-    real_t focalLength_ = 1.0;
+    real_t focalLength_ = 1.0; // Not using currently because treating focusDist same as this.
     Point3 cameraCenter_ = Point3(0, 0, 0);
     Vec3 u_, v_, w_;
 
@@ -72,6 +79,9 @@ class Camera {
     Point3 pixel00_;
     Vec3 pixelDeltaU_;
     Vec3 pixelDeltaV_;
+
+    Vec3 defocusDiskU_;
+    Vec3 defocusDiskV_;
 
     void Initialize() {
         // Image
@@ -85,10 +95,9 @@ class Camera {
         cameraCenter_ = lookfrom_;
 
         // Viewport
-        focalLength_ = (lookfrom_ - lookat_).Length();
         real_t theta = DegreesToRadians(vFov_);
         real_t h = std::tan(theta / 2);
-        real_t viewportHeight = 2.0 * h * focalLength_;
+        real_t viewportHeight = 2.0 * h * focusDist_;
         real_t viewportWidth = viewportHeight * (real_t(imageWidth_) / imageHeight_);
 
         // Basis vectors
@@ -103,11 +112,14 @@ class Camera {
         pixelDeltaV_ = viewportV / imageHeight_;
 
         // -focalLength: Negative-Z-axis (Right-Handed Coordinates)
-        Point3 viewportUpperLeft =
-            cameraCenter_ - focalLength_ * w_ - viewportU / 2 - viewportV / 2;
-
+        Point3 viewportUpperLeft = cameraCenter_ - focusDist_ * w_ - viewportU / 2 - viewportV / 2;
         // The first pixel position
         pixel00_ = viewportUpperLeft + 0.5 * (pixelDeltaU_ + pixelDeltaV_);
+
+        // Defocus disk
+        real_t defocusRadius = focusDist_ * std::tan(DegreesToRadians(defocusAngle_ / 2));
+        defocusDiskU_ = u_ * defocusRadius;
+        defocusDiskV_ = v_ * defocusRadius;
     }
 
     Ray GetRay(int i, int j) const {
@@ -115,7 +127,8 @@ class Camera {
         Point3 pixelSample =
             pixel00_ + ((i + offset.x()) * pixelDeltaU_) + ((j + offset.y()) * pixelDeltaV_);
 
-        Point3 rayOrig = cameraCenter_;
+        // Defocus (Depth of Field)
+        Point3 rayOrig = (defocusAngle_ <= 0) ? cameraCenter_ : DefocusDiskSample();
         Vec3 rayDir = pixelSample - rayOrig;
 
         return Ray(rayOrig, rayDir);
@@ -124,6 +137,11 @@ class Camera {
     Vec3 SampleSquare() const {
         // [0,1) -> [-0.5,+0.5)
         return Vec3(RandomReal() - 0.5, RandomReal() - 0.5, 0);
+    }
+
+    Point3 DefocusDiskSample() const {
+        auto p = RandomInUnitDisk();
+        return cameraCenter_ + (p[0] * defocusDiskU_) + (p[1] * defocusDiskV_);
     }
 
     Color RayColor(const Ray &ray, int depth, const Hittable &world) const {

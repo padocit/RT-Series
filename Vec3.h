@@ -106,6 +106,13 @@ inline Vec3 RandomOnHemisphere(const Vec3 &normal) {
         return -onUnitSphere;
 }
 
+inline Vec3 RandomInUnitDisk() {
+    while (true) {
+        Vec3 p = Vec3(RandomReal(-1, 1), RandomReal(-1, 1), 0);
+        if (p.LengthSquared() < 1) return p;
+    }
+}
+
 inline Vec3 Reflect(const Vec3 &v, const Vec3 &n) { return v - 2 * Dot(v, n) * n; }
 
 inline Vec3 Refract(const Vec3 &uv, const Vec3 &n, real_t etaiOverEtat) {
