@@ -25,7 +25,7 @@ class Lambertian : public Material {
         // Catch degenerate(zero) scatter direction (Prevent inf and NaNs)
         if (scatterDir.NearZero()) scatterDir = rec.normal;
 
-        scatteredRay = Ray(rec.p, scatterDir);
+        scatteredRay = Ray(rec.p, scatterDir, inRay.time());
         attenuation = albedo_; // albedo/P (if using the fixed scatter probability P)
         return true;
     }
@@ -42,7 +42,7 @@ class Metal : public Material {
                  Ray &scatteredRay) const override {
         Vec3 reflectedDir = Reflect(inRay.dir(), rec.normal);
         reflectedDir = Normalize(reflectedDir) + (fuzz_ * RandomUnitVector()); // fuzz
-        scatteredRay = Ray(rec.p, reflectedDir);
+        scatteredRay = Ray(rec.p, reflectedDir, inRay.time());
         attenuation = albedo_;
         return true;
     }
@@ -72,7 +72,7 @@ class Dielectric : public Material {
         else
             direction = Refract(unitDir, rec.normal, ri);
 
-        scatteredRay = Ray(rec.p, direction);
+        scatteredRay = Ray(rec.p, direction, inRay.time());
         return true;
     }
 

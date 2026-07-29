@@ -130,8 +130,9 @@ class Camera {
         // Defocus (Depth of Field)
         Point3 rayOrig = (defocusAngle_ <= 0) ? cameraCenter_ : DefocusDiskSample();
         Vec3 rayDir = pixelSample - rayOrig;
+        real_t rayTime = RandomReal();
 
-        return Ray(rayOrig, rayDir);
+        return Ray(rayOrig, rayDir, rayTime);
     }
 
     Vec3 SampleSquare() const {

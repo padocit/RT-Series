@@ -8,14 +8,17 @@ class Material;
 
 class Sphere : public Hittable {
   public:
+    // Stationary Sphere
     Sphere(const Point3 &center, real_t radius, shared_ptr<Material> mat)
-        : center_(center), radius_(std::fmax(0, radius)), mat_(mat) {
-        // TODO: Initialize the material pointer `mat_`.
-    }
+        : center_(center, Vec3(0, 0, 0)), radius_(std::fmax(0, radius)), mat_(mat) {}
 
-    // TODO: Distinguish sphere behind the camera
+    // Moving Sphere
+    Sphere(const Point3 &center1, const Point3 &center2, real_t radius, shared_ptr<Material> mat)
+        : center_(center1, center2 - center1), radius_(std::fmax(0, radius)), mat_(mat) {}
+
     bool Hit(const Ray &ray, Interval rayT, HitRecord &rec) const override {
-        Vec3 oc = center_ - ray.orig();
+        Point3 currCenter = center_.At(ray.time());
+        Vec3 oc = currCenter - ray.orig();
         real_t a = ray.dir().LengthSquared();
         real_t h = Dot(ray.dir(), oc); // b = -2h
         real_t c = oc.LengthSquared() - radius_ * radius_;
@@ -35,7 +38,7 @@ class Sphere : public Hittable {
         // Hit Record
         rec.t = root;
         rec.p = ray.At(rec.t);
-        Vec3 outwardNormal = (rec.p - center_) / radius_;
+        Vec3 outwardNormal = (rec.p - currCenter) / radius_;
         rec.SetFaceNormal(ray, outwardNormal);
         rec.mat = mat_;
 
@@ -43,7 +46,7 @@ class Sphere : public Hittable {
     }
 
   private:
-    Point3 center_;
+    Ray center_; // For animating spheres
     real_t radius_;
     shared_ptr<Material> mat_;
 };
