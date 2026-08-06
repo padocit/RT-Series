@@ -11,6 +11,8 @@ class Interval {
 
     real_t min() const { return min_; }
     real_t max() const { return max_; }
+    void min(real_t min) { min_ = min; }
+    void max(real_t max) { max_ = max; }
 
     real_t Size() const { return max_ - min_; }
 
@@ -21,6 +23,11 @@ class Interval {
         if (x < min_) return min_;
         if (x > max_) return max_;
         return x;
+    }
+
+    Interval Expand(real_t delta) const {
+        real_t padding = delta / 2;
+        return Interval(min_ - padding, max_ + padding);
     }
 
   private:
