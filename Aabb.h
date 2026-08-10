@@ -14,6 +14,11 @@ class Aabb {
         y_ = (a[1] <= b[1]) ? Interval(a[1], b[1]) : Interval(b[1], a[1]);
         z_ = (a[2] <= b[2]) ? Interval(a[2], b[2]) : Interval(b[2], a[2]);
     }
+    Aabb(const Aabb &box0, const Aabb &box1) {
+        x_ = Interval(box0.x_, box1.x_);
+        y_ = Interval(box0.y_, box1.y_);
+        z_ = Interval(box0.z_, box1.z_);
+    }
 
     const Interval &AxisInterval(int n) const {
         if (n == 1) return y_;

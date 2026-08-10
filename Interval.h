@@ -8,6 +8,11 @@ class Interval {
 
     Interval() : min_(+kInfinity), max_(-kInfinity) {} // Default = empty
     Interval(real_t min, real_t max) : min_(min), max_(max) {}
+    Interval(const Interval &a, const Interval &b) {
+        // Union
+        min_ = a.min_ <= b.min_ ? a.min_ : b.min_;
+        max_ = a.max_ >= b.max_ ? a.max_ : b.max_;
+    }
 
     real_t min() const { return min_; }
     real_t max() const { return max_; }
