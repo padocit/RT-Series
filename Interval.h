@@ -4,7 +4,7 @@
 
 class Interval {
   public:
-    static const Interval kEmpty, kUniverse;
+    static const Interval empty, universe;
 
     Interval() : min_(+kInfinity), max_(-kInfinity) {} // Default = empty
     Interval(real_t min, real_t max) : min_(min), max_(max) {}
@@ -39,5 +39,5 @@ class Interval {
     real_t min_, max_;
 };
 
-const Interval Interval::kEmpty = Interval(+kInfinity, -kInfinity);
-const Interval Interval::kUniverse = Interval(-kInfinity, +kInfinity);
+const Interval Interval::empty = Interval(+kInfinity, -kInfinity);
+const Interval Interval::universe = Interval(-kInfinity, +kInfinity);

@@ -6,6 +6,8 @@
 
 class Aabb {
   public:
+    static const Aabb empty, universe;
+
     Aabb() {}
     Aabb(const Interval &x, const Interval &y, const Interval &z) : x_(x), y_(y), z_(z) {}
     Aabb(const Point3 &a, const Point3 &b) {
@@ -50,6 +52,16 @@ class Aabb {
         return true;
     }
 
+    int LongestAxis() const {
+        if (x_.Size() > y_.Size())
+            return x_.Size() > z_.Size() ? 0 : 2;
+        else
+            return y_.Size() > z_.Size() ? 1 : 2;
+    }
+
   private:
     Interval x_, y_, z_;
 };
+
+const Aabb Aabb::empty = Aabb(Interval::empty, Interval::empty, Interval::empty);
+const Aabb Aabb::universe = Aabb(Interval::universe, Interval::universe, Interval::universe);

@@ -15,7 +15,12 @@ class Bvh : public Hittable {
     Bvh(HittableList list) : Bvh(list.objects(), 0, list.objects().size()) {}
 
     Bvh(std::vector<std::shared_ptr<Hittable>> &objects, size_t start, size_t end) {
-        int axis = RandomInt(0, 2);
+        // The bounding box of the span of objects
+        bbox_ = Aabb::empty;
+        for (size_t objectIndex = start; objectIndex < end; objectIndex++)
+            bbox_ = Aabb(bbox_, objects[objectIndex]->bbox());
+
+        int axis = bbox_.LongestAxis();
 
         auto comparator = (axis == 0) ? BoxCompareX : (axis == 1) ? BoxCompareY : BoxCompareZ;
 
@@ -33,8 +38,6 @@ class Bvh : public Hittable {
             left_ = std::make_shared<Bvh>(objects, start, mid);
             right_ = std::make_shared<Bvh>(objects, mid, end);
         }
-
-        bbox_ = Aabb(left_->bbox(), right_->bbox());
     }
 
     Aabb bbox() const override { return bbox_; }
