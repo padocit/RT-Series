@@ -20,3 +20,6 @@ inline real_t RandomReal() {
 }
 // [min, max)
 inline real_t RandomReal(real_t min, real_t max) { return min + (max - min) * RandomReal(); }
+
+// [min, max]
+inline int RandomInt(int min, int max) { return int(RandomReal(min, max + 1)); }
