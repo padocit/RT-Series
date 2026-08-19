@@ -25,6 +25,6 @@ class HitRecord {
 class Hittable {
   public:
     virtual ~Hittable() = default;
-    virtual Aabb BoundingBox() const = 0;
+    virtual Aabb bbox() const = 0;
     virtual bool Hit(const Ray &ray, Interval rayT, HitRecord &rec) const = 0;
 };

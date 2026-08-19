@@ -25,7 +25,7 @@ class Sphere : public Hittable {
         bbox_ = Aabb(box1, box2);
     }
 
-    Aabb BoundingBox() const override { return bbox_; }
+    Aabb bbox() const override { return bbox_; }
 
     bool Hit(const Ray &ray, Interval rayT, HitRecord &rec) const override {
         Point3 currCenter = center_.At(ray.time());

@@ -12,15 +12,15 @@ class HittableList : public Hittable {
     HittableList() {}
     HittableList(std::shared_ptr<Hittable> object) { Add(object); }
 
-    Aabb BoundingBox() const override { return bbox_; }
-    std::vector<std::shared_ptr<Hittable>> &Objects() { return objects_; }
-    const std::vector<std::shared_ptr<Hittable>> &Objects() const { return objects_; }
+    Aabb bbox() const override { return bbox_; }
+    std::vector<std::shared_ptr<Hittable>> &objects() { return objects_; }
+    const std::vector<std::shared_ptr<Hittable>> &objects() const { return objects_; }
 
     void Clear() { objects_.clear(); }
 
     void Add(std::shared_ptr<Hittable> object) {
         objects_.push_back(object);
-        bbox_ = Aabb(bbox_, object->BoundingBox());
+        bbox_ = Aabb(bbox_, object->bbox());
     }
 
     // Hit() returns &rec
@@ -42,5 +42,5 @@ class HittableList : public Hittable {
 
   private:
     std::vector<std::shared_ptr<Hittable>> objects_;
-    Aabb bbox_;
+    Aabb bbox_; // Bounding box
 };
