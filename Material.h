@@ -2,6 +2,7 @@
 
 #include "Color.h"
 #include "Hittable.h"
+#include "Texture.h"
 
 class Material {
   public:
@@ -16,7 +17,8 @@ class Material {
 // Always scatter and attenuate light according to its reflectance R
 class Lambertian : public Material {
   public:
-    Lambertian(const Color &albedo) : albedo_(albedo) {}
+    Lambertian(const Color &albedo) : tex_(std::make_shared<SolidColor>(albedo)) {}
+    Lambertian(std::shared_ptr<Texture> tex) : tex_(tex) {}
 
     bool Scatter(const Ray &inRay, const HitRecord &rec, Color &attenuation,
                  Ray &scatteredRay) const override {
@@ -26,12 +28,13 @@ class Lambertian : public Material {
         if (scatterDir.NearZero()) scatterDir = rec.normal;
 
         scatteredRay = Ray(rec.p, scatterDir, inRay.time());
-        attenuation = albedo_; // albedo/P (if using the fixed scatter probability P)
+        attenuation =
+            tex_->Value(rec.u, rec.v, rec.p); // albedo/P (if using the fixed scatter probability P)
         return true;
     }
 
   private:
-    Color albedo_;
+    std::shared_ptr<Texture> tex_;
 };
 
 class Metal : public Material {
